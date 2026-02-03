@@ -53,14 +53,14 @@ public class ShowService {
         return modelMapper.map(savedShow, ShowResponseDTO.class);
     }
 
-    public ShowResponseDTO updateShow(ShowRequestDTO showRequestDTO, int id) {
+    public ShowResponseDTO updateShow(ShowRequestDTO showRequestDTO, Long id) {
         Show show = showRepository.findById(id)
                 .orElseThrow(()-> new RuntimeException("show not found"));
         modelMapper.map(showRequestDTO, show);
         return modelMapper.map(showRepository.save(show), ShowResponseDTO.class);
     }
 
-    public void deleteShowById(int id) {
+    public void deleteShowById(Long id) {
         if (!showRepository.existsById(id)) {
             throw new RuntimeException("show not found");
         }
@@ -73,14 +73,14 @@ public class ShowService {
     }
 
     public List<ShowResponseDTO> getShowByMovie(Integer movieId) {
-        return showRepository.findByMovie_Id(movieId).stream() // Use underscore for nested property
+        return showRepository.findByMovie_MovieId(movieId).stream() // Use underscore for nested property
                 .map(show -> modelMapper.map(show, ShowResponseDTO.class))
                 .collect(Collectors.toList());
     }
 
     public List<ShowResponseDTO> getShowByTheater(Integer theaterId) {
         // Fixed: Now calling the correct Theater relationship
-        return showRepository.findByTheater_Id(theaterId).stream()
+        return showRepository.findByTheater_TheaterId(theaterId).stream()
                 .map(show -> modelMapper.map(show, ShowResponseDTO.class))
                 .collect(Collectors.toList());
     }

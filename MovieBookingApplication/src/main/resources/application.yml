@@ -5,9 +5,9 @@ spring:
     password: 12345
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    database-platform: org.hiberbate.dialect.MySQLDialect
+    database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
 jwt:
   secret: uTQRkzeHPp12YhN5sQDy3tBKFTsdc8aUvGJXYWB5tRQ=

@@ -17,7 +17,7 @@ public class Theater {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long theaterId;
     private String theaterName;
     private String theaterLocation;
     private int theaterCapacity;

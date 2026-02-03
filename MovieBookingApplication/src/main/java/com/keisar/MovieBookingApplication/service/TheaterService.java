@@ -41,7 +41,7 @@ public class TheaterService {
     }
 
     public List<TheaterResponseDTO> getTheaterByLocation(String location) {
-        return theaterRepository.findByLocation(location).stream()
+        return theaterRepository.findByTheaterLocation(location).stream()
                 .map(theater -> modelMapper.map(theater, TheaterResponseDTO.class))
                 .collect(Collectors.toList());
     }

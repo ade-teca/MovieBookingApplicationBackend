@@ -21,12 +21,12 @@ public class ShowController {
         return ResponseEntity.ok().body(showService.addShow(showRequestDTO));
     }
     @PutMapping("/{id}")
-    public ResponseEntity<ShowResponseDTO> updateShow(@RequestBody ShowRequestDTO showRequestDTO,@PathVariable int id) {
+    public ResponseEntity<ShowResponseDTO> updateShow(@RequestBody ShowRequestDTO showRequestDTO,@PathVariable Long id) {
         return ResponseEntity.ok().body(showService.updateShow(showRequestDTO, id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteShow(@PathVariable int id) {
+    public ResponseEntity<Void> deleteShow(@PathVariable Long id) {
         showService.deleteShowById(id);
         return ResponseEntity.noContent().build();
     }
