@@ -17,7 +17,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -47,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
 
             var userDetails = userRepository.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("User not found"));
 
-            if(jwtService.isTokenValid(jwtToken, Optional.ofNullable(userDetails))){
+            if(jwtService.isTokenValid(jwtToken, userDetails)){
 
                 List<SimpleGrantedAuthority> authorities = userDetails
                         .getRoles().stream()
