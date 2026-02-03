@@ -12,7 +12,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
-@Getter @Setter
+@Table(name = "users")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class User implements UserDetails {
@@ -20,22 +22,45 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true)
     private String username;
+
     private String password;
     private String email;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private Set<String> roles;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    private Booking booking;
-
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Booking> bookings;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles
                 .stream()
-                .map(SimpleGrantedAuthority::new)
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role)) // Boa prática: prefixo ROLE_
                 .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
