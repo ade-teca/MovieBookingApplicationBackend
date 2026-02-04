@@ -3,6 +3,8 @@ package com.keisar.MovieBookingApplication.service;
 import com.keisar.MovieBookingApplication.dto.request.LoginRequestDTO;
 import com.keisar.MovieBookingApplication.dto.request.RegisterRequestDTO;
 import com.keisar.MovieBookingApplication.dto.response.LoginResponseDTO;
+import com.keisar.MovieBookingApplication.exception.InvalidCredentialsException;
+import com.keisar.MovieBookingApplication.exception.UserAlreadyExistsException;
 import com.keisar.MovieBookingApplication.model.User;
 import com.keisar.MovieBookingApplication.repository.UserRepository;
 import com.keisar.MovieBookingApplication.security.JwtService;
@@ -34,7 +36,7 @@ public class AuthenticationService {
 
     public User registerNormalUser(RegisterRequestDTO registerRequestDTO) {
         if(userRepository.findByUsername(registerRequestDTO.getUsername()).isPresent()) {
-            throw new RuntimeException("Username is already registered");
+            throw new UserAlreadyExistsException("Este nome de usuário já está em uso.");
         }
 
         Set<String> role = new HashSet<>();
@@ -49,7 +51,7 @@ public class AuthenticationService {
     public User registerAdminUser(RegisterRequestDTO registerRequestDTO) {
 
         if(userRepository.findByUsername(registerRequestDTO.getUsername()).isPresent()) {
-            throw new RuntimeException("Username is already registered");
+            throw new UserAlreadyExistsException("Este nome de usuário já está em uso.");
         }
         Set<String> role = new HashSet<>();
         role.add("ROLE_ADMIN");
@@ -63,7 +65,7 @@ public class AuthenticationService {
 
     public LoginResponseDTO loginUser(LoginRequestDTO loginRequestDTO) {
         User user = userRepository.findByUsername(loginRequestDTO.getUsername())
-                .orElseThrow(()-> new RuntimeException("Username is not registered"));
+                .orElseThrow(()-> new InvalidCredentialsException("Usuário ou senha inválidos."));
 
         authenticationManager.authenticate(
                  new UsernamePasswordAuthenticationToken(

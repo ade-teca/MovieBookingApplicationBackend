@@ -2,6 +2,10 @@ package com.keisar.MovieBookingApplication.service;
 
 import com.keisar.MovieBookingApplication.dto.request.BookingRequestDTO;
 import com.keisar.MovieBookingApplication.dto.response.BookingResponseDTO;
+import com.keisar.MovieBookingApplication.exception.CancellationException;
+import com.keisar.MovieBookingApplication.exception.InvalidBookingStateException;
+import com.keisar.MovieBookingApplication.exception.ResourceNotFoundException;
+import com.keisar.MovieBookingApplication.exception.UserAlreadyExistsException;
 import com.keisar.MovieBookingApplication.model.Booking;
 import com.keisar.MovieBookingApplication.model.BookingStatus;
 import com.keisar.MovieBookingApplication.model.Show;
@@ -37,9 +41,9 @@ public class BookingService {
     public BookingResponseDTO addBooking(BookingRequestDTO requestDTO) {
 
         User user = userRepository.findById(requestDTO.getUserId())
-                .orElseThrow(() -> new RuntimeException("Show not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("O recurso com o ID solicitado não foi encontrado"));
         Show show = showRepository.findById(requestDTO.getShowId())
-                .orElseThrow(() -> new RuntimeException("Show not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("O recurso com o ID solicitado não foi encontrado"));
 
         // 1. Get all seat numbers already taken for this show (excluding cancelled bookings)
         List<String> takenSeats = show.getBookings().stream()
@@ -53,7 +57,8 @@ public class BookingService {
                 .toList();
 
         if (!unavailableSeats.isEmpty()) {
-            throw new RuntimeException("The following seats are already occupied: " + unavailableSeats);
+            throw new UserAlreadyExistsException("Os seguintes assentos já estão ocupados: " + unavailableSeats);
+
         }
 
         // 3. (Optional) Double-check the count matches
@@ -75,10 +80,10 @@ public class BookingService {
 
     public BookingResponseDTO confirmBooking(int id) {
         Booking booking = bookingRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Booking not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("O recurso com o ID solicitado não foi encontrado"));
 
         if (booking.getBookingStatus() != BookingStatus.PENDING) {
-            throw new RuntimeException("The following booking is already pending.");
+            throw new InvalidBookingStateException("A reserva não está em um estado que permite esta operação.");
         }
 
         //Ask for payment
@@ -92,7 +97,7 @@ public class BookingService {
     public BookingResponseDTO cancellBooking(int id) {
 
         Booking booking = bookingRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("Booking not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("O recurso com o ID solicitado não foi encontrado"));
 
         validateCancelletion(booking);
         booking.setBookingStatus(BookingStatus.CANCELLED);
@@ -124,11 +129,11 @@ public class BookingService {
         LocalDateTime deadLineTime = showTime.minusHours(2);
 
         if(LocalDateTime.now().isAfter(deadLineTime)) {
-            throw new RuntimeException("Cannot cancel the booking.");
+            throw new CancellationException("Não é possível cancelar uma reserva com menos de 2 horas para o início do filme.");
         }
 
         if(booking.getBookingStatus() == BookingStatus.CANCELLED) {
-            throw new RuntimeException("Booking already cancelled.");
+            throw new InvalidBookingStateException("A reserva não está em um estado que permite esta operação.");
         }
     }
 }

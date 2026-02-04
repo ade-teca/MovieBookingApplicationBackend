@@ -3,6 +3,8 @@ package com.keisar.MovieBookingApplication.service;
 import com.keisar.MovieBookingApplication.dto.request.ShowRequestDTO;
 import com.keisar.MovieBookingApplication.dto.response.MovieResponseDTO;
 import com.keisar.MovieBookingApplication.dto.response.ShowResponseDTO;
+import com.keisar.MovieBookingApplication.exception.DataIntegrityViolationException;
+import com.keisar.MovieBookingApplication.exception.ResourceNotFoundException;
 import com.keisar.MovieBookingApplication.model.Booking;
 import com.keisar.MovieBookingApplication.model.Movie;
 import com.keisar.MovieBookingApplication.model.Show;
@@ -37,9 +39,9 @@ public class ShowService {
     public ShowResponseDTO addShow(ShowRequestDTO showRequestDTO) {
         // 1. Fetch related entities to ensure they exist and link them
         Movie movie = movieRepository.findById(showRequestDTO.getMovieId())
-                .orElseThrow(() -> new RuntimeException("Movie not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("O recurso com o ID solicitado não foi encontrado"));
         Theater theater = theaterRepository.findById(showRequestDTO.getTheaterId())
-                .orElseThrow(() -> new RuntimeException("Theater not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("O recurso com o ID solicitado não foi encontrado"));
 
         // 2. Map basic fields
         Show show = modelMapper.map(showRequestDTO, Show.class);
@@ -55,19 +57,19 @@ public class ShowService {
 
     public ShowResponseDTO updateShow(ShowRequestDTO showRequestDTO, Long id) {
         Show show = showRepository.findById(id)
-                .orElseThrow(()-> new RuntimeException("show not found"));
+                .orElseThrow(()-> new ResourceNotFoundException("O recurso com o ID solicitado não foi encontrado"));
         modelMapper.map(showRequestDTO, show);
         return modelMapper.map(showRepository.save(show), ShowResponseDTO.class);
     }
 
     public void deleteShowById(Long id) {
         if (!showRepository.existsById(id)) {
-            throw new RuntimeException("show not found");
+            throw new DataIntegrityViolationException("Não é possível deletar um show que possui reservas ativas.");
         }
 
         List<Booking> bookings = showRepository.findById(id).get().getBookings();
         if (!bookings.isEmpty()) {
-            throw new RuntimeException("bookings not empty");
+            throw new ResourceNotFoundException("O recurso com o ID solicitado não foi encontrado");
         }
         showRepository.deleteById(id);
     }

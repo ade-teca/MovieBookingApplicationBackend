@@ -3,6 +3,7 @@ package com.keisar.MovieBookingApplication.service;
 
 import com.keisar.MovieBookingApplication.dto.request.MovieRequestDTO;
 import com.keisar.MovieBookingApplication.dto.response.MovieResponseDTO;
+import com.keisar.MovieBookingApplication.exception.ResourceNotFoundException;
 import com.keisar.MovieBookingApplication.model.Movie;
 import com.keisar.MovieBookingApplication.repository.MovieRepository;
 import org.modelmapper.ModelMapper;
@@ -53,14 +54,14 @@ public class MovieService {
 
     public MovieResponseDTO updateMovie(MovieRequestDTO movieRequest, Integer id) {
         Movie movie = movieRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Movie not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("O recurso com o ID solicitado não foi encontrado"));
         modelMapper.map(movieRequest, movie);
         return modelMapper.map(movieRepository.save(movie), MovieResponseDTO.class);
     }
 
     public void deleteMovie(Integer id) {
         if (!movieRepository.existsById(id)) {
-            throw new RuntimeException("Movie not found with id: " + id);
+            throw new ResourceNotFoundException("O recurso com o ID solicitado não foi encontrado");
         }
         movieRepository.deleteById(id);
     }
