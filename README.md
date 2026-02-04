@@ -25,9 +25,9 @@ O projeto já conta com o fluxo completo de reserva, desde a gestão de filmes a
 
 ## 🏗️ Próximos Passos (Roadmap)
 
-- [ ] Implementar Segurança com Spring Security e **JWT**.
-- [ ] Configuração de perfis de banco de dados (`application.yml`).
-- [ ] Tratamento Global de Exceções.
+- [X] Implementar Segurança com Spring Security e **JWT**.
+- [X] Configuração de perfis de banco de dados (`application.yml`).
+- [X] Tratamento Global de Exceções.
 - [ ] Testes Unitários e de Integração (JUnit/Mockito).
 
 ## 📝 Como executar (Em breve)
